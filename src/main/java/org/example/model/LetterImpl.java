@@ -1,17 +1,24 @@
 package org.example.model;
 
-public class LetterImpl implements Letter, Comparable<Letter> {
+public class LetterImpl implements Letter {
   private final char letter;
   private final int index;
 
   public LetterImpl(char letter, int index) {
+    if (!Character.isLetter(letter)) {
+      throw new IllegalArgumentException("Letter character is not a letter.");
+    }
+    if (index < 0) {
+      throw new IllegalArgumentException("Index is less than 0");
+    }
+
     this.letter = letter;
     this.index = index;
   }
 
   @Override
   public char getLetter() {
-    return letter;
+    return Character.toUpperCase(letter);
   }
 
   @Override
@@ -21,14 +28,12 @@ public class LetterImpl implements Letter, Comparable<Letter> {
 
   @Override
   public int compareTo(Letter other) {
-    if (letter == other.getLetter()) {
-      if (index == other.getIndex()) {
-        return 1; // When letter and index are the same.
-      } else {
-        return 0; // When letter is the same, but not index.
+    if (this.getLetter() == other.getLetter()) {
+      if (this.getIndex() == other.getIndex()) {
+        return 1;
       }
-    } else {
-      return -1; // When nothing is the same.
+      return 0;
     }
+    return -1;
   }
 }

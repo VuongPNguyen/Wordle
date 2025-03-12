@@ -12,12 +12,17 @@ public class WordImpl implements Word, Comparable<Word> {
   }
 
   public WordImpl(Letter[] word) {
+    for(int index = 0; index < word.length; index++) {
+      if (word[index] == null) {
+        throw new IllegalArgumentException("Letter[" + index + "] is null.");
+      }
+    }
     this.word = word;
   }
 
   @Override
-  public Letter getLetterAtIndex(int index) {
-    return word[index];
+  public char getLetterAtIndex(int index) {
+    return word[index].getLetter();
   }
 
   @Override
@@ -27,6 +32,9 @@ public class WordImpl implements Word, Comparable<Word> {
 
   @Override
   public int compareTo(Word other) {
+    if (other == null) {
+      throw new IllegalArgumentException("Other Word is null.");
+    }
     // Ensure the length equals.
     if (this.getLength() != other.getLength()) {
       return -1;
