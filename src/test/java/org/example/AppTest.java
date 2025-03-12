@@ -1,87 +1,18 @@
 package org.example;
 
-import junit.framework.TestCase;
-import org.example.model.Letter;
-import org.example.model.LetterImpl;
 import org.example.model.Word;
 import org.example.model.WordImpl;
+import org.example.model.Wordle;
+import org.example.model.WordleImpl;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /** Unit test for simple App. */
-@SuppressWarnings({"ReassignedVariable", "UnusedAssignment", "unused", "DataFlowIssue"})
-public class AppTest extends TestCase {
-  /** Test Letter constructors */
-  public void testLetterConstructor() {
-    // Test constructor for "space" char.
-    boolean exception = false;
-    try {
-      Letter test = new LetterImpl(' ', 0);
-    } catch (IllegalArgumentException iae) {
-      exception = true;
-    } catch (Exception ignored) {
-    }
-    assertTrue(exception);
-
-    // Test constructor for number char.
-    exception = false;
-    try {
-      Letter test = new LetterImpl('1', 0);
-    } catch (IllegalArgumentException iae) {
-      exception = true;
-    } catch (Exception ignored) {
-    }
-    assertTrue(exception);
-
-    // Test constructor for negative index.
-    exception = false;
-    try {
-      Letter test = new LetterImpl('a', -1);
-    } catch (IllegalArgumentException iae) {
-      exception = true;
-    } catch (Exception ignored) {
-    }
-    assertTrue(exception);
-
-    // Test constructor correct use.
-    exception = false;
-    try {
-      Letter test = new LetterImpl('a', 0);
-    } catch (IllegalArgumentException iae) {
-      exception = true;
-    } catch (Exception ignored) {
-    }
-    assertFalse(exception);
-  }
-
-  /** Test Letter methods */
-  public void testLetterMethods() {
-    Letter a0 = new LetterImpl('a', 0);
-    assertEquals('A', a0.getLetter());
-    assertFalse('B' == a0.getLetter());
-    assertEquals(0, a0.getIndex());
-    assertFalse(1 == a0.getIndex());
-  }
-
-  /** Test Letter compareTo() */
-  public void testLetterCompareTo() {
-    // Testing equal letter and index.
-    Letter a0 = new LetterImpl('a', 0);
-    Letter a0_1 = new LetterImpl('a', 0);
-    assertEquals(1, a0.compareTo(a0_1));
-
-    // Testing equal letter.
-    Letter a1 = new LetterImpl('a', 1);
-    assertEquals(0, a0.compareTo(a1));
-
-    // Testing equal index.
-    Letter b0 = new LetterImpl('b', 0);
-    assertEquals(-1, a0.compareTo(b0));
-
-    // Testing different letter and index.
-    Letter b1 = new LetterImpl('b', 1);
-    assertEquals(-1, a0.compareTo(b1));
-  }
-
+@SuppressWarnings({"ReassignedVariable", "UnusedAssignment", "unused"})
+public class AppTest {
   /** Test Word constructors */
+  @Test
   public void testWordConstructor() {
     boolean exception = false;
     Word w;
@@ -91,39 +22,25 @@ public class AppTest extends TestCase {
       exception = true;
     } catch (Exception ignored) {}
     assertFalse(exception);
-
-    exception = false;
-    Letter[] letterArray = new Letter[3];
-    letterArray[0] = new LetterImpl('a', 0);
-    letterArray[1] = new LetterImpl('b', 1);
-    letterArray[2] = new LetterImpl('c', 2);
-    try {
-      w = new WordImpl(letterArray);
-    } catch (IllegalArgumentException iae) {
-      exception = true;
-    } catch (Exception ignored) {}
-    assertFalse(exception);
   }
 
   /** Test Word methods */
+  @Test
   public void testWordMethods() {
     Word w = new WordImpl("test");
     assertEquals(4, w.getLength());
-    assertEquals('T', w.getLetterAtIndex(0));
-    assertEquals('E', w.getLetterAtIndex(1));
-    assertEquals('S', w.getLetterAtIndex(2));
-    assertEquals('T', w.getLetterAtIndex(3));
+    assertEquals('T', w.getCharAtIndex(0));
+    assertEquals('E', w.getCharAtIndex(1));
+    assertEquals('S', w.getCharAtIndex(2));
+    assertEquals('T', w.getCharAtIndex(3));
+    assertTrue(w.containsLetter('T'));
   }
 
   /** Test Word compareTo */
+  @Test
   public void testWordCompareTo() {
     Word w = new WordImpl("test");
-    Letter[] letterArray = new Letter[4];
-    letterArray[0] = new LetterImpl('t', 0);
-    letterArray[1] = new LetterImpl('e', 1);
-    letterArray[2] = new LetterImpl('s', 2);
-    letterArray[3] = new LetterImpl('t', 3);
-    Word x = new WordImpl(letterArray);
+    Word x = new WordImpl("test");
     assertEquals(1, w.compareTo(x));
 
     Word y = new WordImpl("tests");
@@ -139,5 +56,42 @@ public class AppTest extends TestCase {
       exception = true;
     } catch (Exception ignored) {}
     assertTrue(exception);
+  }
+
+  /** Test Word toString */
+  @Test
+  public void testWordToString() {
+    Word w = new WordImpl("test");
+    assertEquals("TEST", w.toString());
+  }
+
+  /** Test Wordle getters and setters. */
+  @Test
+  public void testWordleMethods() {
+    Wordle w = new WordleImpl("test");
+    assertEquals(0, w.getAttempt());
+    assertEquals("TEST", w.getAnswer().toString());
+    assertTrue(w.isLetterCorrect('t', 3));
+    assertTrue(w.isLetterInAnswer('T'));
+    w.addLetter('t');
+    assertEquals("T", w.getGuess().toString());
+    assertTrue(w.isLetterCorrect(w.getGuess().getCharAtIndex(0), 0));
+    assertFalse(w.compareGuessToAnswer());
+    w.addLetter('e');
+    w.addLetter('s');
+    w.addLetter('t');
+    assertTrue(w.compareGuessToAnswer());
+    w.removeLetter();
+    assertEquals("TES", w.getGuess().toString());
+    w.resetGuess();
+    assertEquals("", w.getGuess().toString());
+    w.addLetter('t');
+    w.addLetter('e');
+    w.addLetter('s');
+    w.addLetter('s');
+    int[] testArray = w.submitGuess();
+    assertArrayEquals(new int[]{1, 1, 1, 0}, testArray);
+    assertEquals("", w.getGuess().toString());
+    assertEquals(1, w.getAttempt());
   }
 }
